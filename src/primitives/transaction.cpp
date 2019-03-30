@@ -96,6 +96,15 @@ unsigned int CTransaction::GetTotalSize() const
     return ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION);
 }
 
+//////////////////////////////////////////////////////////////////////
+bool CTransaction::HasCreateOrCall() const {
+    for(const CTxOut& v : vout)
+        if(v.scriptPubKey.HasOpCreate() || v.scriptPubKey.HasOpCall())
+            return true;
+    return false;
+}
+//////////////////////////////////////////////////////////////////////
+
 std::string CTransaction::ToString() const
 {
     std::string str;

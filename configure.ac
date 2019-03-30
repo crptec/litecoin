@@ -857,10 +857,14 @@ fi
 LEVELDB_CPPFLAGS=
 LIBLEVELDB=
 LIBMEMENV=
-AM_CONDITIONAL([EMBEDDED_LEVELDB],[true])
+AM_CONDITIONAL([EMBEDDED_LEVELDB],[false])
 AC_SUBST(LEVELDB_CPPFLAGS)
 AC_SUBST(LIBLEVELDB)
 AC_SUBST(LIBMEMENV)
+
+AC_CHECK_LIB([leveldb],      [main],AC_SUBST([LIBLEVELDB],[-lleveldb]), AC_MSG_ERROR(LIBLEVELDB missing))
+AC_CHECK_LIB([memenv],      [main],AC_SUBST([LIBMEMENV],[-lmemenv]), AC_MSG_ERROR(LIBMEMENV missing))
+LIBLEVELDB="$LIBLEVELDB $LIBMEMENV"
 
 if test x$enable_wallet != xno; then
     dnl Check for libdb_cxx only if wallet enabled
@@ -900,6 +904,7 @@ fi
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_THREAD
+AX_BOOST_RANDOM
 AX_BOOST_CHRONO
 
 dnl Boost 1.56 through 1.62 allow using std::atomic instead of its own atomic
@@ -967,7 +972,7 @@ fi
 
 if test x$use_boost = xyes; then
 
-BOOST_LIBS="$BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_FILESYSTEM_LIB $BOOST_THREAD_LIB $BOOST_CHRONO_LIB"
+BOOST_LIBS="$BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_FILESYSTEM_LIB $BOOST_THREAD_LIB $BOOST_CHRONO_LIB $BOOST_RANDOM_LIB"
 
 
 dnl If boost (prior to 1.57) was built without c++11, it emulated scoped enums

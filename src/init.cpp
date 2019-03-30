@@ -1489,6 +1489,17 @@ bool AppInitMain()
                     return InitError(_("Incorrect or no genesis block found. Wrong datadir for network?"));
                 }
 
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                dev::eth::Ethash::init();
+                boost::filesystem::path ltcEthStateDir = GetDataDir() / "stateltcEth";
+                bool fStatus = boost::filesystem::exists(ltcEthStateDir);
+                const std::string dirltcEth(ltcEthStateDir.string());
+                const dev::h256 hashDB(dev::sha3(dev::rlp("")));
+                dev::eth::BaseState existsltcEthstate = fStatus ? dev::eth::BaseState::PreExisting : dev::eth::BaseState::Empty;
+                globalState = std::unique_ptr<ltcEthState>(new ltcEthState(dev::u256(0), ltcEthState::openDB(dirltcEth, hashDB, dev::WithExisting::Trust), existsltcEthstate));
+                globalState->setRoot(hashDB);
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 // Check for changed -prune state.  What we are concerned about is a user who has pruned blocks
                 // in the past, but is now trying to run unpruned.
                 if (fHavePruned && !fPruneMode) {

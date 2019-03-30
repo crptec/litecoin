@@ -181,6 +181,13 @@ enum opcodetype
     OP_NOP9 = 0xb8,
     OP_NOP10 = 0xb9,
 
+    // Execute EXT byte code.
+    OP_CREATE = 0xc1,
+    OP_CALL = 0xc2,
+    OP_VERSION = 0xf6,
+    OP_GAS_LAP = 0xf7,
+    OP_DATA = 0xf8,
+
     OP_INVALIDOPCODE = 0xff,
 };
 
@@ -315,6 +322,12 @@ public:
     {
         return serialize(m_value);
     }
+
+    /////////////////////////////////
+    int64_t getvalue() const{
+        return m_value;
+    }
+    /////////////////////////////////
 
     static std::vector<unsigned char> serialize(const int64_t& value)
     {
@@ -514,6 +527,15 @@ public:
             return OP_0;
         return (opcodetype)(OP_1+n-1);
     }
+    int Find(opcodetype op) const
+    {
+        int nFound = 0;
+        opcodetype opcode;
+        for (const_iterator pc = begin(); pc != end() && GetOp(pc, opcode);)
+            if (opcode == op)
+                ++nFound;
+        return nFound;
+    }
 
     /**
      * Pre-version-0.6, Bitcoin always counted CHECKMULTISIGs
@@ -550,6 +572,18 @@ public:
     {
         return (size() > 0 && *begin() == OP_RETURN) || (size() > MAX_SCRIPT_SIZE);
     }
+
+    /////////////////////////////////////////
+    bool HasOpCreate() const
+    {
+        return Find(OP_CREATE) > 0;
+    }
+
+     bool HasOpCall() const
+    {
+        return Find(OP_CALL) > 0;
+    }
+    /////////////////////////////////////////
 
     void clear()
     {
